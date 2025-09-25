@@ -31,4 +31,21 @@ apiServices.Register = async (firstName, lastName, email, password) => {
 
 }
 
+apiServices.UploadFile = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('testFile', file);
+
+    const response = await axios.post(`${API}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+
+    return response.data.message;
+  } catch (err) {
+    return err.message;
+  }
+};
+
 export default apiServices;
