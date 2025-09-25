@@ -8,7 +8,7 @@ apiServices.Login = async (email, password) => {
         const response = await axios.post(`${API}/login`, {
             email,
             password
-        })
+        }, { withCredentials: true })
         return response.data.message;
     }catch(err){
         return err.message
@@ -23,7 +23,7 @@ apiServices.Register = async (firstName, lastName, email, password) => {
             lastName,
             email,
             password
-        })
+        }, { withCredentials: true })
         return response.data.message;
     }catch(err){
         return err.message
@@ -39,8 +39,8 @@ apiServices.UploadFile = async (file) => {
     const response = await axios.post(`${API}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      }
-    });
+      },  withCredentials: true
+    } );
 
     return response.data.message;
   } catch (err) {
