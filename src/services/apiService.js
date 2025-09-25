@@ -16,4 +16,19 @@ apiServices.Login = async (email, password) => {
 
 }
 
+apiServices.Register = async (firstName, lastName, email, password) => {
+    try{
+        const response = await axios.post(`${API}/signup`, {
+            firstName,
+            lastName,
+            email,
+            password
+        })
+        return response.data.message;
+    }catch(err){
+        return err.message
+    }
+
+}
+
 export default apiServices;
