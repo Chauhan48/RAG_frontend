@@ -6,6 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './components/layout'
 import Signup from './components/Signup'
 import Dashboard from './components/Dashboard';
+import Topics from './components/Topics';
 
 function App() {
 
@@ -22,6 +23,14 @@ function App() {
         element={
           <Layout>
             <Dashboard />
+          </Layout>
+        }
+      />
+      <Route
+        path='/topics'
+        element={
+          <Layout>
+            <Topics />
           </Layout>
         }
       />

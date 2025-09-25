@@ -48,4 +48,24 @@ apiServices.UploadFile = async (file) => {
   }
 };
 
+apiServices.videoUrl = async (url) => {
+    try{
+        const response = await axios.post(`${API}/video-url`, url, { withCredentials: true })
+        return response.data.message;
+
+    }catch(err){
+        return err.message;
+    }
+}
+
+apiServices.topics = async () => {
+    try{
+        const response = await axios.get(`${API}/topics`, { withCredentials: true })
+        return response.data;
+
+    }catch(err){
+        return err.message;
+    }
+}
+
 export default apiServices;

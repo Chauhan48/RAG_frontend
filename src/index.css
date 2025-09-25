@@ -113,3 +113,28 @@ nav li:hover {
   color: #646cff;
 }
 
+select {
+  appearance: none;
+  background-color: #1e1e1e;
+  color: #eee;
+  border: 1.5px solid #646cff;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 240px;
+  outline: none;
+}
+
+select:focus {
+  border-color: #535bf2;
+  box-shadow: 0 0 8px #535bf2;
+}
+
+option {
+  background-color: #1e1e1e;
+  color: #eee;
+  padding: 0.5rem;
+}
