@@ -16,24 +16,19 @@ const Topics = () => {
         fetchTopics();
     }, [])
 
-    const handleClick = () => {
-        async function questionList() {
-            const result = await apiServices.questions(topic);
-            console.log(result);
-        }
-        questionList();
-        navigate('/questions');
+    const handleClick = async () => {
+        const result = await apiServices.questions(topic);
+        navigate('/questions', { state: { questions: result.questions } });
     }
 
     return (
         <div style={{
-            display: 'flex',
+            display: 'relative',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             padding: '1rem',
             borderRadius: '8px',
-            display: 'relative',
             margin: '5%'
         }} >
             <h1>What topic will you Conquer?</h1>
