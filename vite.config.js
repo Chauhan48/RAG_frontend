@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/RAG_frontend/',
   plugins: [react()],
+  base: '/RAG_frontend/',
+  build: {
+    outDir: 'dist',
+  }
+
 })
