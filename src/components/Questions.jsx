@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import apiServices from '../services/apiService';
 
 export default function Questions() {
   const location = useLocation();
@@ -8,7 +9,8 @@ export default function Questions() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(null);
-  const [hint, setHint] = useState(false);
+  const [answeredCorrectly, setAnsweredCorrectly] = useState([]); // Array to track correctness per question
+  const [showHint, setShowHint] = useState(false);
 
   if (!questions.length) {
     return (
@@ -22,19 +24,72 @@ export default function Questions() {
   const currentQuestion = questions[currentIndex];
 
   const handlePrevious = () => {
-    setSelectedOptionId(null); // reset selection when navigating
+    setShowHint(false);
+    setSelectedOptionId(null);
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   const handleNext = () => {
-    setSelectedOptionId(null); // reset selection when navigating
-    if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1);
+    if (selectedOptionId === null) return; // Prevent next if no option selected
+
+    const selectedOption = currentQuestion.options.find(opt => opt._id === selectedOptionId);
+    const isCorrect = selectedOption?.isCorrect || false;
+
+    // Update answeredCorrectly array for current question
+    const updatedAnswers = [...answeredCorrectly];
+    updatedAnswers[currentIndex] = isCorrect;
+    setAnsweredCorrectly(updatedAnswers);
+
+    // Show hint for next question only if current question was answered incorrectly
+    setShowHint(!isCorrect);
+
+    // Reset selected option for next question
+    setSelectedOptionId(null);
+
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
   };
 
-  const handleSubmit = () => {
-    alert('Test submitted!');
-    // Add your submit logic here
-  };
+const handleSubmit = async () => {
+  // Record the answer for the current (last) question
+  if (selectedOptionId !== null) {
+    const selectedOption = currentQuestion.options.find(opt => opt._id === selectedOptionId);
+    const isCorrect = selectedOption?.isCorrect || false;
+    
+    const updatedAnswers = [...answeredCorrectly];
+    updatedAnswers[currentIndex] = isCorrect;
+    setAnsweredCorrectly(updatedAnswers);
+
+    // Calculate final scores
+    const correctCount = updatedAnswers.filter(Boolean).length;
+    const scorePercentage = (correctCount / questions.length) * 100;
+    const incorrectQuestions = questions
+      .filter((_, i) => !updatedAnswers[i])
+      .map(q => q._id);
+
+    const progressData = { scorePercentage, incorrectQuestions };
+
+    const result = await apiServices.submitProgress(progressData);
+
+    if (result.success) {
+      alert(`Quiz completed! Score: ${scorePercentage.toFixed(1)}% (${correctCount}/${questions.length} correct)\n${result.message}`);
+      navigate('/dashboard');
+    } else if (result.needsAuth) {
+      alert('Your session has expired. Please log in again.');
+      navigate('/'); // or wherever your login page is
+    } else {
+      alert('Failed to submit progress: ' + result.message);
+    }
+  }
+};
+
+
+
+  // Determine if hint should be shown:
+  // Don't show for the first question,
+  // For others, show only if user was incorrect on previous
+  const shouldShowHint = currentIndex > 0 && showHint;
 
   return (
     <div
@@ -55,8 +110,8 @@ export default function Questions() {
         {currentQuestion.questionText}
       </p>
 
-      <div style={{ marginBottom: '2rem' }}>
-        {currentQuestion.options.map((option) => (
+      <div style={{ marginBottom: '1rem' }}>
+        {currentQuestion.options.map(option => (
           <label
             key={option._id}
             style={{
@@ -83,6 +138,21 @@ export default function Questions() {
         ))}
       </div>
 
+      {shouldShowHint && (
+        <div
+          style={{
+            marginBottom: '1rem',
+            backgroundColor: '#44475a',
+            padding: '0.75rem 1rem',
+            borderRadius: '8px',
+            color: '#f1fa8c',
+            fontStyle: 'italic',
+          }}
+        >
+          Hint: {currentQuestion.hint}
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
           onClick={handlePrevious}
@@ -105,6 +175,7 @@ export default function Questions() {
         {currentIndex < questions.length - 1 ? (
           <button
             onClick={handleNext}
+            disabled={selectedOptionId === null}
             style={{
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
@@ -115,13 +186,13 @@ export default function Questions() {
               fontWeight: '600',
               fontSize: '1rem',
             }}
-            disabled={!selectedOptionId} // disable if no option selected
           >
             Next
           </button>
         ) : (
           <button
             onClick={handleSubmit}
+            disabled={selectedOptionId === null}
             style={{
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
@@ -132,7 +203,6 @@ export default function Questions() {
               fontWeight: '600',
               fontSize: '1rem',
             }}
-            disabled={!selectedOptionId} // disable if no option selected
           >
             Submit
           </button>

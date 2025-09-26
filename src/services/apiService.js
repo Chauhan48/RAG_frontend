@@ -77,4 +77,25 @@ apiServices.questions = async (topic) => {
     }
 }
 
+apiServices.submitProgress = async (progressData) => {
+  try {
+    const response = await axios.post(
+      `${API}/progress`,
+      progressData,
+      { withCredentials: true }
+    );
+    return { success: true, message: response.data.message };
+  } catch (err) {
+    console.error('Submit progress error:', err.response?.data || err.message);
+    
+    if (err.response?.status === 401) {
+      return { success: false, message: 'Unauthorized - please log in again', needsAuth: true };
+    }
+    
+    // Return the actual server error message if available
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message;
+    return { success: false, message: errorMessage };
+  }
+};
+
 export default apiServices;
