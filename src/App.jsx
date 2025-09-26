@@ -7,6 +7,7 @@ import Layout from './components/layout'
 import Signup from './components/Signup'
 import Dashboard from './components/Dashboard';
 import Topics from './components/Topics';
+import Questions from './components/Questions';
 
 function App() {
 
@@ -34,8 +35,16 @@ function App() {
           </Layout>
         }
       />
+      <Route
+        path='/questions'
+        element={
+          <Layout>
+            <Questions />
+          </Layout>
+        }
+      />
     </Routes>
+    
   )
 }
-
 export default App

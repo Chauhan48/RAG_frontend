@@ -68,4 +68,13 @@ apiServices.topics = async () => {
     }
 }
 
+apiServices.questions = async (topic) => {
+    try{
+        const response = await axios.get(`${API}/questions?topic=${topic}`, { withCredentials: true })
+        return response.data;
+    }catch(err){
+        return err.message;
+    }
+}
+
 export default apiServices;
